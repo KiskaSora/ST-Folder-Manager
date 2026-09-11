@@ -1771,11 +1771,18 @@
   /* 竖版缩略图：美化截图一般为手机竖屏比例 */
   aspect-ratio: 3 / 4;
   border-radius: 5px;
-  background-size: cover;
-  background-position: center;
+  /* contain：按原图比例完整显示、不放大不裁剪，避免 cover 在比例不符时 upscale 变糊；
+     比例不符时留白处显示深色背景（见 background-color） */
+  object-fit: contain;
+  object-position: center;
+  display: block;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.35);
   background-color: rgba(0, 0, 0, 0.3);
+}
+/* 缩略图加载失败（文件缺失/被清理）时的灰色占位 */
+.cfm-theme-gallery-img-broken {
+  opacity: 0.6;
 }
 .cfm-theme-gallery-item .cfm-theme-gallery-name {
   font-size: 11px;
@@ -1924,6 +1931,119 @@
     right: -14px;
     width: 28px;
     height: 28px;
+  }
+}
+
+/* ========== 头像管理器弹窗（char/user 共用，复用主题画廊基础样式） ========== */
+.cfm-avatar-gallery {
+  width: min(720px, 94vw) !important;
+}
+.cfm-avatar-gallery .cfm-theme-gallery-grid {
+  max-height: 52vh;
+}
+.cfm-avatar-gallery .cfm-theme-gallery-section {
+  /* 头像为正方形比例，PC 一行 5 个 */
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 10px;
+}
+.cfm-avatar-gallery .cfm-theme-gallery-item {
+  padding: 5px;
+}
+.cfm-avatar-gallery .cfm-theme-gallery-item .cfm-theme-gallery-thumb {
+  /* 头像用 1:1 正方形缩略图 */
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  /* 与主题缩略图一致：contain 完整显示不放大裁剪，避免头像比例非 1:1 时 cover 放大变糊 */
+  object-fit: contain;
+}
+/* 顶部导入按钮（+），位于标题文字右侧 */
+.cfm-avatar-gallery-import {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(166, 227, 161, 0.2);
+  color: #a6e3a1;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.cfm-avatar-gallery-import:hover {
+  background: rgba(166, 227, 161, 0.4);
+}
+/* 标题 + 导入按钮组（+ 紧挨标题文字，与关闭按钮保持距离） */
+.cfm-avatar-gallery-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* tabs 栏 */
+.cfm-avatar-gallery-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.cfm-avatar-gallery-tab {
+  flex: 1;
+  padding: 7px 12px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #a6adc8;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+.cfm-avatar-gallery-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.cfm-avatar-gallery-tab-active {
+  border-color: rgba(137, 180, 250, 0.5);
+  background: rgba(137, 180, 250, 0.18);
+  color: #cdd6f4;
+}
+/* 放大预览操作按钮配色 */
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-apply {
+  border-color: rgba(137, 180, 250, 0.5);
+  background: rgba(137, 180, 250, 0.2);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-apply:hover {
+  background: rgba(137, 180, 250, 0.35);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-fav {
+  border-color: rgba(250, 179, 135, 0.5);
+  background: rgba(250, 179, 135, 0.18);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-fav:hover {
+  background: rgba(250, 179, 135, 0.35);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-unfav {
+  border-color: rgba(245, 194, 66, 0.5);
+  background: rgba(245, 194, 66, 0.18);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-unfav:hover {
+  background: rgba(245, 194, 66, 0.35);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-del {
+  border-color: rgba(243, 139, 168, 0.5);
+  background: rgba(243, 139, 168, 0.18);
+}
+.cfm-theme-gallery-zoom-actions .cfm-avatar-gallery-btn-del:hover {
+  background: rgba(243, 139, 168, 0.35);
+}
+@media (max-width: 768px) {
+  .cfm-avatar-gallery .cfm-theme-gallery-section {
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
   }
 }
 
@@ -4313,6 +4433,140 @@ textarea.cfm-edit-input {
 .cfm-preset-detail-popup .cfm-edit-input {
   min-height: 120px;
   resize: vertical;
+}
+
+/* ========== Persona 具体设定副本 ========== */
+/* 字段头「副本」按钮（与最大化按钮同款小方钮） */
+.cfm-edit-popup-snapshot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(148, 226, 213, 0.28);
+  background: rgba(148, 226, 213, 0.1);
+  color: #94e2d5;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+.cfm-edit-popup-snapshot:hover {
+  background: rgba(148, 226, 213, 0.2);
+  border-color: rgba(148, 226, 213, 0.45);
+}
+.cfm-edit-popup-snapshot:active {
+  transform: scale(0.96);
+}
+
+/* 副本面板 */
+.cfm-snapshot-panel {
+  width: min(480px, 90vw);
+  max-height: min(70vh, 640px);
+  display: flex;
+  flex-direction: column;
+}
+.cfm-snapshot-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  max-height: 42vh;
+}
+.cfm-snapshot-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 6px;
+  transition: border-color 0.15s ease;
+}
+.cfm-snapshot-row-active {
+  border-color: rgba(137, 180, 250, 0.5);
+  background: rgba(137, 180, 250, 0.08);
+}
+.cfm-snapshot-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.cfm-snapshot-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 11px;
+  background: none;
+  border: none;
+  padding: 0;
+  transition: all 0.15s;
+}
+.cfm-snapshot-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+}
+.cfm-snapshot-actions .cfm-snapshot-pin:hover,
+.cfm-snapshot-actions .cfm-snapshot-pin-active {
+  color: #f9e2af;
+  background-color: rgba(249, 226, 175, 0.18);
+}
+.cfm-snapshot-actions .cfm-snapshot-apply:hover {
+  color: #a6e3a1;
+}
+.cfm-snapshot-actions .cfm-snapshot-del:hover {
+  color: #f38ba8;
+}
+.cfm-snapshot-note {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  color: var(--SmartThemeBodyColor, #cdd6f4);
+}
+.cfm-snapshot-active-mark {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: #89b4fa;
+  background: rgba(137, 180, 250, 0.15);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.cfm-snapshot-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: #a6adc8;
+  font-size: 13px;
+}
+
+/* 底部「设为副本」/「更新」按钮 */
+.cfm-edit-popup-actions .cfm-edit-popup-save-snapshot {
+  color: #94e2d5;
+  border-color: rgba(148, 226, 213, 0.3);
+}
+.cfm-edit-popup-actions .cfm-edit-popup-save-snapshot:hover {
+  background: rgba(148, 226, 213, 0.14);
+  border-color: rgba(148, 226, 213, 0.5);
+}
+.cfm-edit-popup-actions .cfm-edit-popup-update-snapshot {
+  color: #f9e2af;
+  border-color: rgba(249, 226, 175, 0.3);
+}
+.cfm-edit-popup-actions .cfm-edit-popup-update-snapshot:hover {
+  background: rgba(249, 226, 175, 0.14);
+  border-color: rgba(249, 226, 175, 0.5);
 }
 
 /* ========== 插件内预设 Prompt 编辑器 ========== */
