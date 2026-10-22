@@ -529,14 +529,22 @@ export function createSharedSectionsCore(deps) {
   function renderLanguageSwitchSection(body) {
     const current = extension_settings[extensionName].language || "zh-CN";
     const isTW = current === "zh-TW";
+    const isRU = current === "ru";
+    const label = isRU ? "Язык интерфейса" : isTW ? "介面語言" : "界面语言";
+    const hint = isRU
+      ? "Переключает язык интерфейса плагина (перевод покрывает основную часть UI; отдельные редкие строки могут остаться на китайском). Изменения вступят в силу после переоткрытия плагина."
+      : isTW
+        ? "切換插件介面顯示的語言。切換後需重新打開插件生效。"
+        : "切换插件界面显示的语言。切换后需重新打开插件生效。";
     const section = $(`
       <div class="cfm-config-section" data-cfm-no-convert>
-        <label>${isTW ? "介面語言" : "界面语言"}</label>
+        <label>${label}</label>
         <div style="display:flex;gap:8px;margin-top:6px;">
-          <button class="cfm-lang-btn menu_button ${!isTW ? "cfm-mode-active" : ""}" data-lang="zh-CN" style="flex:1;">简体中文</button>
+          <button class="cfm-lang-btn menu_button ${!isTW && !isRU ? "cfm-mode-active" : ""}" data-lang="zh-CN" style="flex:1;">简体中文</button>
           <button class="cfm-lang-btn menu_button ${isTW ? "cfm-mode-active" : ""}" data-lang="zh-TW" style="flex:1;">繁體中文</button>
+          <button class="cfm-lang-btn menu_button ${isRU ? "cfm-mode-active" : ""}" data-lang="ru" style="flex:1;">Русский</button>
         </div>
-        <div class="cfm-icon-config-hint">${isTW ? "切換插件介面顯示的中文字體。切換後需重新打開插件生效。" : "切换插件界面显示的中文字体。切换后需重新打开插件生效。"}</div>
+        <div class="cfm-icon-config-hint">${hint}</div>
       </div>
     `);
     section.find(".cfm-lang-btn").on("click touchend", function (e) {
@@ -548,11 +556,12 @@ export function createSharedSectionsCore(deps) {
       getContext().saveSettingsDebounced();
       section.find(".cfm-lang-btn").removeClass("cfm-mode-active");
       $(this).addClass("cfm-mode-active");
-      cfmToastr.success(
-        lang === "zh-TW"
-          ? "已切換為繁體中文，重新打開插件後生效"
-          : "已切换为简体中文，重新打开插件后生效",
-      );
+      const switchMsgs = {
+        "zh-TW": "已切換為繁體中文，重新打開插件後生效",
+        "zh-CN": "已切换为简体中文，重新打开插件后生效",
+        ru: "Переключено на русский язык, вступит в силу после переоткрытия плагина",
+      };
+      cfmToastr.success(switchMsgs[lang] || lang);
     });
     body.append(section);
   }

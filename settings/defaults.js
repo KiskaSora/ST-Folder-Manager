@@ -84,7 +84,7 @@ export function ensureSettingsDefaults({
   // 移动端下栏全屏模式："to-search"(至搜索栏，默认) | "to-tabs"(至标签页) | "true-full"(真全屏)
   if (!settings.mobileFullscreenMode)
     settings.mobileFullscreenMode = "to-search";
-  // 界面语言："zh-CN"(简体中文，默认) | "zh-TW"(繁体中文)
+  // 界面语言："zh-CN"(简体中文，默认) | "zh-TW"(繁体中文) | "ru"(俄语)
   if (!settings.language) settings.language = "zh-CN";
   // 本地备份桥接（127.0.0.1:36925）连接开关：默认关闭，避免无后台服务时反复报 ERR_CONNECTION_REFUSED
   if (settings.bridgeEnabled === undefined) settings.bridgeEnabled = false;
